@@ -27,17 +27,22 @@ import org.testng.internal.ConstructorOrMethod;
  * 
  */
 public class TestNGProgressRunListener implements ITestListener {
-	private Map<String, String> testKIds = new HashMap<String, String>();
-	private AtomicLong atomicLong = new AtomicLong(0);
-
-	private MessageSender messageSender;
-	private IMessageSenderFactory messageSenderFactory = new SocketMessageSenderFactory();
+	private final Map<String, String> testIds = new HashMap<String, String>();
+	private final AtomicLong atomicLong = new AtomicLong(0);
+	private final IMessageSenderFactory messageSenderFactory;
 	private long startTime;
 
+	public TestNGProgressRunListener(IMessageSenderFactory messageSenderFactory) {
+		this.messageSenderFactory = messageSenderFactory;
+	}
+	
+	public TestNGProgressRunListener() {
+		this.messageSenderFactory = new SocketMessageSenderFactory();
+	}
 
 	private void sendTestTree(Map<String, ArrayList<String>> classMap, ITestContext context) {
+		MessageSender messageSender = (MessageSender)context.getAttribute("messageSender");
 		String xmlTestName = context.getCurrentXmlTest().getName();
-		//String parentName = suiteName + ":" + xmlTestName;
 		String runId = getRunId(context);
 		Iterator<Entry<String, ArrayList<String>>> it = classMap.entrySet()
 				.iterator();
@@ -67,15 +72,16 @@ public class TestNGProgressRunListener implements ITestListener {
 	}
 
 	private String getTestId(String key) {
-		String test = testKIds.get(key);
+		String test = testIds.get(key);
 		if (test == null) {
 			test = Long.toString(atomicLong.incrementAndGet());
-			testKIds.put(key, test);
+			testIds.put(key, test);
 		}
 		return test;
 	}
 
 	public void onTestSuccess(ITestResult result) {
+		MessageSender messageSender = (MessageSender)result.getTestContext().getAttribute("messageSender");
 		ITestNGMethod testMethod = result.getMethod();
 		String testId = getIdForMethod(result.getTestContext(), testMethod);
 		String mthdKey = getMessageSenderNameForMethod(testMethod);
@@ -101,6 +107,7 @@ public class TestNGProgressRunListener implements ITestListener {
 	}
 
 	public void onTestFailure(ITestResult result) {
+		MessageSender messageSender = (MessageSender)result.getTestContext().getAttribute("messageSender");
 		ITestNGMethod testMethod = result.getMethod();
 		String testId = getIdForMethod(result.getTestContext(), testMethod);
 		String mthdKey = getMessageSenderNameForMethod(testMethod);
@@ -110,7 +117,7 @@ public class TestNGProgressRunListener implements ITestListener {
 	}
 
 	public void onTestSkipped(ITestResult result) {
-
+		MessageSender messageSender = (MessageSender)result.getTestContext().getAttribute("messageSender");
 		ITestNGMethod testMethod = result.getMethod();
 		String testId = getIdForMethod(result.getTestContext(), testMethod);
 		String mthdKey = getMessageSenderNameForMethod(testMethod);
@@ -126,8 +133,8 @@ public class TestNGProgressRunListener implements ITestListener {
 	}
 
 	public void onStart(ITestContext context) {
-		
-		messageSender = messageSenderFactory.getMessageSender();
+
+		MessageSender messageSender = messageSenderFactory.getMessageSender();
 
 		try {
 			messageSender.init();
@@ -135,7 +142,7 @@ public class TestNGProgressRunListener implements ITestListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		context.setAttribute("messageSender", messageSender);		
 		
 		String parentName = getRunId(context);
 		String runId = parentName;
@@ -153,7 +160,7 @@ public class TestNGProgressRunListener implements ITestListener {
 	}
 
 	public void onFinish(ITestContext context) {
-
+		MessageSender messageSender = (MessageSender)context.getAttribute("messageSender");
 		long stopTime = System.currentTimeMillis();
 		messageSender.testRunEnded(stopTime - startTime, getRunId(context));
 		try {
@@ -218,6 +225,7 @@ public class TestNGProgressRunListener implements ITestListener {
 	}
 
 	public void onTestStart(ITestResult result) {
+		MessageSender messageSender = (MessageSender)result.getTestContext().getAttribute("messageSender");
 		ITestNGMethod testMethod = result.getMethod();
 		String testId = getIdForMethod(result.getTestContext(), testMethod);
 		String mthdKey = getMessageSenderNameForMethod(testMethod);
