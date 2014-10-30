@@ -30,7 +30,6 @@ public class TestNGProgressRunListener implements ITestListener {
 	private final Map<String, String> testIds = new HashMap<String, String>();
 	private final AtomicLong atomicLong = new AtomicLong(0);
 	private final IMessageSenderFactory messageSenderFactory;
-	private long startTime;
 
 	public TestNGProgressRunListener(IMessageSenderFactory messageSenderFactory) {
 		this.messageSenderFactory = messageSenderFactory;
@@ -155,14 +154,12 @@ public class TestNGProgressRunListener implements ITestListener {
 		messageSender.testTree(testId, context.getCurrentXmlTest().getName(), true, classMap.keySet()
 				.size(), runId);
 		sendTestTree(classMap,context);
-		startTime = System.currentTimeMillis();
-
 	}
 
 	public void onFinish(ITestContext context) {
 		MessageSender messageSender = (MessageSender)context.getAttribute("messageSender");
-		long stopTime = System.currentTimeMillis();
-		messageSender.testRunEnded(stopTime - startTime, getRunId(context));
+		long elapsedTime = context.getEndDate().getTime()-context.getStartDate().getTime();
+		messageSender.testRunEnded(elapsedTime, getRunId(context));
 		try {
 			messageSender.shutdown();
 		} catch (IOException e) {
