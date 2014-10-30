@@ -12,6 +12,10 @@ import org.json.JSONObject;
 public class JSONObjectsMessageSenderFactory implements IMessageSenderFactory {
 	private List<StringWriter> writers = new ArrayList<StringWriter>();
 	
+	/**
+	 * Get all the messages sent. There will be a JSONObject[] for each MessageSender used (ie for each runId)
+	 * @return
+	 */
 	public synchronized JSONObject[][] getMessages() {
 		JSONObject[][] messages = new JSONObject[writers.size()][];
 		for (int i = 0; i < writers.size(); i++) {
