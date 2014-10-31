@@ -90,16 +90,9 @@ public class TestNGProgressRunListenerTest {
 		String firstTestRunId = messages[0][0].getString("runId");
 		String secondTestRunId = messages[1][0].getString("runId");
 		assertFalse(firstTestRunId.equals(secondTestRunId));
-		assertAllMessagesHaveRunId(messages[0], firstTestRunId);
-		assertAllMessagesHaveRunId(messages[1], secondTestRunId);
 	}
 	
-	private void assertAllMessagesHaveRunId(JSONObject[] messages, String runId) {
-		for (JSONObject message : messages) {
-			assertEquals(runId, message.getString("runId"));
-		}
-	}
-		
+	
 	private JSONObject[] runTests(Class<?>... testClasses) {
 		StringWriter sw = new StringWriter();
 		PrintWriter pw = new PrintWriter(sw);
