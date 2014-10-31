@@ -92,6 +92,19 @@ public class TestNGProgressRunListenerTest {
 		assertFalse(firstTestRunId.equals(secondTestRunId));
 	}
 	
+	@Test
+	public void testSuiteParallelMethods() {
+		// Given
+		String resourceName = "testng-suite-parallel-methods.xml";
+
+		// When
+		JSONObject[][] messages = runTests(resourceName);
+
+		// Then
+		String firstTestRunId = messages[0][0].getString("runId");
+		String secondTestRunId = messages[1][0].getString("runId");
+		assertFalse(firstTestRunId.equals(secondTestRunId));
+	}	
 	
 	private JSONObject[] runTests(Class<?>... testClasses) {
 		StringWriter sw = new StringWriter();
