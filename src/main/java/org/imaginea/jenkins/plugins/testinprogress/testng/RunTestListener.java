@@ -71,10 +71,7 @@ public class RunTestListener implements ITestListener {
 		return test;
 	}
 
-	private void sendTestTree(Map<String, ArrayList<String>> classMap)
-			throws IOException {
-
-		String xmlTestName = context.getCurrentXmlTest().getName();
+	private void sendTestTree(Map<String, ArrayList<String>> classMap) throws IOException {
 		Iterator<Entry<String, ArrayList<String>>> it = classMap.entrySet()
 				.iterator();
 		while (it.hasNext()) {
@@ -85,10 +82,9 @@ public class RunTestListener implements ITestListener {
 
 			String classTestId = getTestId(clssTreedIdName);
 			ArrayList<String> methods = entry.getValue();
-			int classChilds = methods.size();
 
 			messageSender.testTree(classTestId, className, getTestId(runId),
-					xmlTestName, true, classChilds);
+					true);
 
 			for (String method : methods) {
 				String methodKey = method + "(" + className + ")";
@@ -97,7 +93,7 @@ public class RunTestListener implements ITestListener {
 				String mthdTestId = getTestId(mthdTreedIdName);
 
 				messageSender.testTree(mthdTestId, methodKey, classTestId,
-						className, false, 1);
+						false);
 			}
 		}
 	}
@@ -206,7 +202,7 @@ public class RunTestListener implements ITestListener {
 
 			String testId = getTestId(parentName);
 			messageSender.testTree(testId, context.getCurrentXmlTest()
-					.getName(), true, classMap.keySet().size());
+					.getName(), null, true);
 			sendTestTree(classMap);
 		} catch (IOException e) {
 			throw new RuntimeIOException(e);
