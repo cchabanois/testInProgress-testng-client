@@ -150,6 +150,7 @@ public class RunTestListener implements ITestListener {
 
 		try {
 			messageSender.testError(testId, mthdKey, trace);
+			messageSender.testEnded(testId, mthdKey, false);
 		} catch (IOException e) {
 			throw new RuntimeIOException(e);
 		}
