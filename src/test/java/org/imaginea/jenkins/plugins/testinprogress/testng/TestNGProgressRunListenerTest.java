@@ -30,7 +30,7 @@ public class TestNGProgressRunListenerTest {
 		Class<?> testClass = TestHelloWorld.class;
 
 		// When
-		JSONObject[] messages = runTests(testClass);
+		JSONObject[] messages = runTests(testClass)[0];
 
 		// Then
 		assertEquals("TESTC", messages[0].getString("messageId"));
@@ -42,7 +42,7 @@ public class TestNGProgressRunListenerTest {
 		Class<?> testClass = TestHelloWorld.class;
 
 		// When
-		JSONObject[] messages = runTests(testClass);
+		JSONObject[] messages = runTests(testClass)[0];
 
 		// Then
 		assertEquals("RUNTIME",
@@ -55,7 +55,7 @@ public class TestNGProgressRunListenerTest {
 		Class<?> testClass = CharUtilsTest.class;
 
 		// When
-		JSONObject[] messages = runTests(testClass);
+		JSONObject[] messages = runTests(testClass)[0];
 
 		// Then
 		printTestMessages(messages);
@@ -106,23 +106,16 @@ public class TestNGProgressRunListenerTest {
 		assertFalse(firstTestRunId.equals(secondTestRunId));
 	}	
 	
-	private JSONObject[] runTests(Class<?>... testClasses) {
-		StringWriter sw = new StringWriter();
-		PrintWriter pw = new PrintWriter(sw);
-
+	private JSONObject[][] runTests(Class<?>... testClasses) {
 		TestNG testNG = new TestNG();
 		testNG.setUseDefaultListeners(false);
 		testNG.setVerbose(0);
 		testNG.setTestClasses(testClasses);
+		JSONObjectsMessageSenderFactory jsonObjectsMessageSenderFactory = new JSONObjectsMessageSenderFactory();
 		testNG.addListener(new TestNGProgressRunListener(
-				new SimpleMessageSenderFactory(pw)));
+				jsonObjectsMessageSenderFactory));
 		testNG.run();
-		String[] messages = sw.toString().split("\n");
-		JSONObject[] jsonObjects = new JSONObject[messages.length];
-		for (int i = 0; i < messages.length; i++) {
-			jsonObjects[i] = new JSONObject(messages[i]);
-		}
-		return jsonObjects;
+		return jsonObjectsMessageSenderFactory.getMessages();
 	}
 
 	private JSONObject[][] runTests(String resourceName) {
