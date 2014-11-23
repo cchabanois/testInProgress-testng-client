@@ -196,8 +196,7 @@ public class RunTestListener implements ITestListener {
 		String parentName = runId;
 		String runId = parentName;
 		try {
-			messageSender.testRunStarted(context.getAllTestMethods().length,
-					runId);
+			messageSender.testRunStarted(runId);
 
 			Map<String, ArrayList<String>> classMap = processTestContext();
 
